@@ -8,6 +8,7 @@ using WebAPI2_demo.Models;
 
 namespace WebAPI2_demo.Controllers
 {
+    [RoutePrefix("api/Contact")]
     public class ContactController : ApiController
     {
         private Contact[] contacts = new Contact[]
@@ -18,12 +19,14 @@ namespace WebAPI2_demo.Controllers
         };
 
         // GET: api/Contact
+        [Route("")]
         public IEnumerable<Contact> Get()
         {
             return contacts;
         }
 
         // GET: api/Contact/5
+        [Route("{id:int}")]
         public IHttpActionResult Get(int id)
         {
             Contact contact = contacts.FirstOrDefault<Contact>(c => c.Id == id);
@@ -36,7 +39,17 @@ namespace WebAPI2_demo.Controllers
             return Ok(contact);
         }
 
+        [Route("{name}")]
+        [HttpGet]
+        public IEnumerable<Contact> FindContactByName(string name)
+        {
+            Contact[] contactArray = contacts.Where<Contact>(c => c.FirstName.Contains(name)).ToArray<Contact>();
+
+            return contactArray;
+        }
+
         // POST: api/Contact
+        [Route("")]
         public IEnumerable<Contact> Post([FromBody]Contact newContact)
         {
             List<Contact> contactList = contacts.ToList<Contact>();
@@ -48,6 +61,7 @@ namespace WebAPI2_demo.Controllers
         }
 
         // PUT: api/Contact/5
+        [Route("{id:int}")]
         public IEnumerable<Contact> Put(int id, [FromBody]Contact changedContact)
         {
             Contact contact = contacts.FirstOrDefault<Contact>(c => c.Id == id);
@@ -61,8 +75,11 @@ namespace WebAPI2_demo.Controllers
         }
 
         // DELETE: api/Contact/5
-        public void Delete(int id)
+        [Route("{id:int}")]
+        public IEnumerable<Contact> Delete(int id)
         {
+            contacts = contacts.Where<Contact>(c => c.Id != id).ToArray<Contact>();
+            return contacts;
         }
     }
 }
